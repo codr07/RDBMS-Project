@@ -44,6 +44,7 @@ function loadDatabases() {
       </div>
       <div class="item-actions">
         <button class="action-btn select-db" data-id="${db.id}">Select</button>
+        <button class="action-btn view-db" data-id="${db.id}">View</button>
         <button class="action-btn delete-db" data-id="${db.id}">Delete</button>
       </div>
     `;
@@ -57,6 +58,11 @@ function loadDatabases() {
   
   document.querySelectorAll('.delete-db').forEach(btn => {
     btn.addEventListener('click', (e) => deleteDatabase(e.target.getAttribute('data-id')));
+  });
+
+  // View database tables directly in content area
+  document.querySelectorAll('.view-db').forEach(btn => {
+    btn.addEventListener('click', (e) => showDatabaseTables(e.target.getAttribute('data-id')));
   });
 }
 
@@ -123,6 +129,22 @@ function selectDatabase(dbId) {
   // Load tables for this database
   const event = new CustomEvent('database-selected', { detail: selectedDb });
   document.dispatchEvent(event);
+}
+
+function showDatabaseTables(dbId) {
+  const databases = getDatabases();
+  const db = databases.find(d => d.id === dbId);
+  if (!db) return;
+  // Switch to tables tab
+  const tablesTabBtn = document.querySelector('[data-tab="tables"]');
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.panel');
+  tabButtons.forEach(btn => btn.classList.remove('active'));
+  panels.forEach(panel => panel.classList.remove('active'));
+  tablesTabBtn.classList.add('active');
+  document.getElementById('tables-panel').classList.add('active');
+  // Select database to load its tables
+  selectDatabase(dbId);
 }
 
 /**
